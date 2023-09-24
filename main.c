@@ -25,7 +25,7 @@ int word_compare(const void *a, const void *b, void *udata) {
     return strcmp(ua->arr, ub->arr) && ua->size == ub->size;
 }
 
-void append_letter(struct word* word, char letter)
+void add_symbol(struct word* word, char letter)
 {
     int index = word->size;
 
@@ -34,7 +34,7 @@ void append_letter(struct word* word, char letter)
 }
 
 
-struct word* get_next_word(FILE *file_ptr)
+struct word* extract_next_word(FILE *file_ptr)
 {
     struct  word *found = malloc(sizeof(struct word));
     char current_char;
@@ -44,14 +44,14 @@ struct word* get_next_word(FILE *file_ptr)
         if (!isalpha((unsigned char) current_char)) {
             continue;
         }
-        append_letter(found, current_char);
+        add_symbol(found, current_char);
         break;
     }
 
 
     while (((current_char = fgetc(file_ptr)) != EOF) && isalpha((unsigned char) current_char))
     {
-        append_letter(found, current_char);
+        add_symbol(found, current_char);
     }
 
     return found;
@@ -59,14 +59,13 @@ struct word* get_next_word(FILE *file_ptr)
 
 int main(int argc, char *argv[])
 {
-    int max_size = 0;
-    DynamicCStringArray *arr = init_dynamic_array(10);
+    vector *arr = init(10);
     struct hashmap *map = hashmap_new(sizeof(struct word), 0, 0, 0, word_hash, word_compare, NULL, NULL);
-    const char* source_filename = argv[1];
+    int max_count = 0;
 
+    const char* source_filename = argv[1];
     FILE *source_ptr;
     source_ptr = fopen(source_filename, "r");
-
     if (source_ptr == NULL)
     {
         printf("Can not open file!\n");
@@ -75,28 +74,27 @@ int main(int argc, char *argv[])
 
     while (feof(source_ptr) == 0)
     {
-        struct word* current_word = get_next_word(source_ptr);
+        struct word* current_word = extract_next_word(source_ptr);
         struct word* word_with_count = hashmap_get(map, current_word);
+
         if (word_with_count != NULL) {
-            word_with_count->count = word_with_count->count + 1;
-            hashmap_set(map, word_with_count);
+            current_word->count = word_with_count->count + 1;
+            hashmap_set(map, current_word);
         } else {
             current_word->count = 1;
-            word_with_count = current_word;
             hashmap_set(map, current_word);
         }
 
-        if (word_with_count->count == max_size) {
-            append(arr, word_with_count->arr);
-        } else if (word_with_count->count > max_size) {
-            clear(arr);
-            max_size = word_with_count->count;
-            append(arr, word_with_count->arr);
+        if (current_word->count == max_count) {
+            add(arr, current_word->arr);
+        } else if (current_word->count > max_count) {
+            delete_all(arr);
+            max_count = current_word->count;
+            add(arr, current_word->arr);
         }
     }
 
     FILE *output_file;
-
     output_file = fopen("./output.txt", "w");
     if (output_file == NULL) {
         perror("Output file opening failed");
@@ -108,7 +106,7 @@ int main(int argc, char *argv[])
         fputs("\n", output_file);
     }
 
-    free_dynamic_array(arr);
+    terminate(arr);
     fclose(source_ptr);
     fclose(output_file);
 

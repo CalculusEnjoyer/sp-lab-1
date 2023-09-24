@@ -5,12 +5,12 @@ typedef struct {
     const char **array;
     int size;
     int capacity;
-} DynamicCStringArray;
+} vector;
 
-DynamicCStringArray *init_dynamic_array(int initial_capacity);
+vector *init(int initial_capacity);
 
-void append(DynamicCStringArray *arr, const char *element);
+void add(vector *arr, const char *element);
 
-void free_dynamic_array(DynamicCStringArray *arr);
+void terminate(vector *arr);
 
-void clear(DynamicCStringArray *arr);
+void delete_all(vector *arr);

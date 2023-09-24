@@ -4,15 +4,13 @@
 #include "array.h"
 
 
-DynamicCStringArray *init_dynamic_array(int initial_capacity) {
-    DynamicCStringArray *arr = malloc(sizeof(DynamicCStringArray));
+vector *init(int initial_capacity) {
+    vector *arr = malloc(sizeof(vector));
     if (arr == NULL) {
-        perror("Failed to allocate memory for the dynamic array");
         exit(EXIT_FAILURE);
     }
     arr->array = malloc(initial_capacity * sizeof(const char *));
     if (arr->array == NULL) {
-        perror("Failed to allocate memory for the array elements");
         free(arr);
         exit(EXIT_FAILURE);
     }
@@ -21,12 +19,11 @@ DynamicCStringArray *init_dynamic_array(int initial_capacity) {
     return arr;
 }
 
-void append(DynamicCStringArray *arr, const char *element) {
+void add(vector *arr, const char *element) {
     if (arr->size == arr->capacity) {
         arr->capacity *= 2;
         arr->array = realloc(arr->array, arr->capacity * sizeof(const char *));
         if (arr->array == NULL) {
-            perror("Failed to reallocate memory for the array elements");
             exit(EXIT_FAILURE);
         }
     }
@@ -39,15 +36,15 @@ void append(DynamicCStringArray *arr, const char *element) {
     arr->size++;
 }
 
-void clear(DynamicCStringArray *arr) {
+void delete_all(vector *arr) {
     for (int i = 0; i < arr->size; i++) {
         free((void*)arr->array[i]);
     }
     arr->size = 0;
 }
 
-void free_dynamic_array(DynamicCStringArray *arr) {
-    clear(arr);
+void terminate(vector *arr) {
+    delete_all(arr);
     free(arr->array);
     free(arr);
 }
