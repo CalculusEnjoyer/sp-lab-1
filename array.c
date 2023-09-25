@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include "array.h"
 
 
@@ -9,7 +10,7 @@ vector *init(int initial_capacity) {
     if (arr == NULL) {
         exit(EXIT_FAILURE);
     }
-    arr->array = malloc(initial_capacity * sizeof(const char *));
+    arr->array = malloc(initial_capacity * sizeof(const wchar_t *));
     if (arr->array == NULL) {
         free(arr);
         exit(EXIT_FAILURE);
@@ -19,20 +20,20 @@ vector *init(int initial_capacity) {
     return arr;
 }
 
-void add(vector *arr, const char *element) {
+void add(vector *arr, const wchar_t *element) {
     if (arr->size == arr->capacity) {
         arr->capacity *= 2;
-        arr->array = realloc(arr->array, arr->capacity * sizeof(const char *));
+        arr->array = realloc(arr->array, arr->capacity * sizeof(const wchar_t *));
         if (arr->array == NULL) {
             exit(EXIT_FAILURE);
         }
     }
     for (int i = 0; i < arr->size; i++) {
-        if (strcmp(element, arr->array[i]) == 0) {
+        if (wcscmp(element, arr->array[i]) == 0) {
             return;
         }
     }
-    arr->array[arr->size] = strdup(element);
+    arr->array[arr->size] = wcsdup(element);
     arr->size++;
 }
 
